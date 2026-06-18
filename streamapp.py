@@ -12,7 +12,7 @@ st.title("I learned image processing with open cv")
 st.markdown("Here are some of the things I can do!")
 st.markdown("Streamlit sidebar for navigation, chose image filters or live video effects!")
 st.markdown("Also learned numpy and pandas, you can upload your own csvs or txt files and visualize them in the \"Data Visualization\" tab!")
-
+st.markdown("Seems to be a bug with streamlit publishing. The videos are all blue(no idea how to fix lol) but also for the video filters, you have to reload the page, navigate to the filter you want, then press start each time you want to do a new filter.")
 
 st.sidebar.header("Source")
 mode = st.sidebar.radio("Choose Media Type:", ["Image Filters", "Live Filters", "Data Visualization"])
@@ -106,7 +106,7 @@ if mode == "Image Filters":
                     cv2.rectangle(contour_img, (bx-10, by-10), (bx+bw+10, by+bh+10), (0, 255, 0), 2)
                 st.image(cv2.cvtColor(contour_img, cv2.COLOR_BGR2RGB), caption="Contour Boxes", width="stretch")
     else:
-        st.info("Drop in an image file to the uploader first!")
+        st.info("Drop in an image to the uploader thingy first!")
         
         
         
@@ -115,11 +115,11 @@ if mode == "Image Filters":
 elif mode == "Live Filters":
     st.subheader("Live video effects! yayyayayay")
     
-    # FIX: Using the updated WebRTC naming conventions
+    
     from streamlit_webrtc import webrtc_streamer, VideoProcessorBase
 
     live_filter = st.selectbox(
-        "Select Active Pipeline:",
+        "Select Active Effect:",
         [
             "regular video", 
             "Line filter",
@@ -130,7 +130,7 @@ elif mode == "Live Filters":
     )
     
     speed = st.sidebar.slider("Line Speed", 1, 12, 4) if live_filter == "Line filter" else 0
-    live_thresh = st.slider("Live Binary Threshold Limit Picker", 0, 255, 80) if live_filter == "Threshold Matrix" else 80
+    live_thresh = st.slider("Binary contrast threshold", 0, 255, 80) if live_filter == "Threshold Matrix" else 80
 
     class VideoProcessor(VideoProcessorBase):
         def __init__(self):
@@ -196,7 +196,7 @@ elif mode=="Data Visualization":
         if df is not None:
             st.markdown("Pandas matrix")
             st.dataframe(df,use_container_width = True)
-            st.caption(f"shape matrix dimensions: {df.shape[0]} rows by {df.shape[1]} columns")
+            st.caption(f"shape matrix dimensions side x: {df.shape[0]} rows by side y {df.shape[1]} columns")
             st.markdown("---")
             st.markdown("Matplotlib renders") 
             chart_type=st.selectbox(
@@ -224,15 +224,15 @@ elif mode=="Data Visualization":
                 st.pyplot(fig)
                 
             elif chart_type=="Pie chart generator":
-                label_col = st.selectbox("Select Categorical Labels Column (e.g., hobby/ingredient):", all_columns)
-                value_col = st.selectbox("Select Quantitative Value Counts Column:", all_columns)
+                label_col = st.selectbox("Select Category (like ingredient, hobby, ect):", all_columns)
+                value_col = st.selectbox("Select quantitative values ", all_columns)
                 
                 ax.pie(df[value_col], labels=df[label_col], autopct='%1.2f%%', shadow=True)
                 st.pyplot(fig)
             elif chart_type=="double bar graph comparison":
-                x_axis_col = st.selectbox("Select Independent Variable Label Column (e.g., years):", all_columns)
-                series_1 = st.selectbox("Select Performance Group 1 Metric (e.g., Phelps):", all_columns)
-                series_2 = st.selectbox("Select Performance Group 2 Metric (e.g., Spitz):", all_columns)
+                x_axis_col = st.selectbox("Select Independent Variable (years, time, amount):", all_columns)
+                series_1 = st.selectbox("Select group 1:", all_columns)
+                series_2 = st.selectbox("Select group 2:", all_columns)
                 
                 ax.bar(df[x_axis_col], df[series_1], alpha=0.5, label=series_1, color='blue')
                 ax.bar(df[x_axis_col], df[series_2], alpha=0.5, label=series_2, color='green')
@@ -241,12 +241,12 @@ elif mode=="Data Visualization":
                 st.pyplot(fig)
             
             elif chart_type== "histogram":
-                data_col = st.selectbox("Select Distribution Numeric Column (e.g., movieratings):", all_columns)
-                bin_count = st.slider("Select Quantity Partition Bins", 3, 20, 6)
+                data_col = st.selectbox("Select Numeric Column (like amazon ratings or sum):", all_columns)
+                bin_count = st.slider("Select quantity partitions", 3, 20, 6)
                 
                 ax.hist(df[data_col], bins=bin_count, rwidth=0.8, color='purple', alpha=0.7)
                 ax.set_ylabel("Frequency Counts")
                 ax.set_xlabel(data_col)
                 st.pyplot(fig)
             else:
-                st.info("Put in csv or or an xy coordinate text file")
+                st.info("Put in csv or or an xy coordinate text file OR ELSE IT WONT WORK")

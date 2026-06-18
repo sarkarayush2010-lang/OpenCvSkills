@@ -177,9 +177,7 @@ while camera.isOpened():
 camera.release()
 cv2.destroyAllWindows()
 
-#make line filter social media top to bottom
-#whatever behind the line stays fixed
-#can not use for loop and no other while loop
+
 
 #version 1
 '''
@@ -209,7 +207,6 @@ while camera.isOpened():
 camera.release()
 cv2.destroyAllWindows()
 '''
-#sorry i kinda ran out of time but i did the above thing by myself (the rest may or may not be with ai help) but that counts right?
 
 import cv2
 import numpy as np
