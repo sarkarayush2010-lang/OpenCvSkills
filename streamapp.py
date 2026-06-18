@@ -1,4 +1,4 @@
-#this took me longer than 3 hours please help me
+#this took me longer than 4 hours please help me
 #
 import cv2
 import numpy as np
@@ -11,10 +11,11 @@ st.set_page_config(page_title="Cv2 stuff!", layout="wide")
 st.title("I learned image processing with open cv")
 st.markdown("Here are some of the things I can do!")
 st.markdown("Streamlit sidebar for navigation, chose image filters or live video effects!")
+st.markdown("Also learned numpy and pandas, you can upload your own csvs or txt files and visualize them in the \"Data Visualization\" tab!")
 
 
 st.sidebar.header("Source")
-mode = st.sidebar.radio("Choose Media Type:", ["Image Filters", "Live Filters"])
+mode = st.sidebar.radio("Choose Media Type:", ["Image Filters", "Live Filters", "Data Visualization"])
 
 kernel = np.ones((5, 5), np.uint8)
 
@@ -29,7 +30,6 @@ if mode == "Image Filters":
         
         col1, col2 = st.columns(2)
         with col1:
-            # FIX: Updated width parameter to remove warnings
             st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), caption="Original Image", width="stretch")
             
         with col2:
@@ -55,7 +55,7 @@ if mode == "Image Filters":
                 st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), width="stretch")
             elif filter_choice == "resized image":
                 resized=cv2.resize(img,(640,480))
-                st.image(cv2.cvtColor(resized, cv2.COLOR_BGR2RGB), caption="Resized image!")
+                st.image(cv2.cvtColor(resized, cv2.COLOR_BGR2RGB), caption="Resized image!", width="stretch")
             elif filter_choice == "Grayscale":
                 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 st.image(gray, caption="Grayscale", clamp=True, width="stretch")
@@ -116,7 +116,6 @@ if mode == "Image Filters":
 elif mode == "Live Filters":
     st.subheader("Live video effects! yayyayayay")
     
-    # Move the pipeline selector to the main page area for a cleaner layout
     live_filter = st.selectbox(
         "Select Active Pipeline:",
         [
@@ -128,11 +127,9 @@ elif mode == "Live Filters":
         ]
     )
     
-    # Keep the custom speed modifier in the sidebar if the line filter is active
     speed = st.sidebar.slider("Line Speed", 1, 12, 4) if live_filter == "Line filter" else 0
     run_cam = st.checkbox("< -- click here to give me FULL control over your camera (dont worry it only enables the program to see your camera lol its not dangerous i think)")
     
-    # CRITICAL: Create the two stable side-by-side layout columns *before* the loop starts
     col_left, col_right = st.columns(2)
     
     with col_left:
@@ -147,7 +144,9 @@ elif mode == "Live Filters":
         camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         liney = 0
         canvas = None
-        
+        live_thresh = 80
+        if live_filter == "Threshold Matrix":
+            live_thresh = st.slider("Live Binary Threshold Limit Picker", 0, 255, 80)
         while run_cam:
             ret, frame = camera.read()
             if not ret:
@@ -162,9 +161,9 @@ elif mode == "Live Filters":
                 
             elif live_filter == "Threshold Matrix":
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                _, blackf = cv2.threshold(gray, 80, 255, cv2.THRESH_BINARY_INV)
-                
-                # Stack the gray and binary frames side-by-side for the effect column
+                col_left, col_right = st.columns(2)
+    
+                _, blackf = cv2.threshold(gray, live_thresh, 255, cv2.THRESH_BINARY_INV)
                 gray_3ch = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
                 bin_3ch = cv2.cvtColor(blackf, cv2.COLOR_GRAY2BGR)
                 matrix_strip = np.hstack((gray_3ch, bin_3ch))
@@ -201,3 +200,76 @@ elif mode == "Live Filters":
         camera.release()
     else:
         st.warning("Camera hardware module doesnt exist, plug it back in now. or your computers bugged")
+        
+        
+#==============================================Mode 3 - Data Analytics Sandbox =====================================
+elif mode=="Data Visualization":
+    st.subheader("Pandas and Matplotlib visualizer thing")
+    st.markdown("")
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    uploaded_data=st.file_uploader("Upload a csv or txt NOTHING ELSE IT DOESNT WORK: ", type = ["csv","txt"])
+    if uploaded_data is not None:
+        if uploaded_data.name.endswith('.txt'):
+            df=pd.read_csv(uploaded_data, sep=None, engine="python")
+        else:
+            df=pd.read_csv(uploaded_data)
+        st.markdown("Pandas data array matrix")
+        
+        if df is not None:
+            st.markdown("Pandas matrix")
+            st.dataframe(df,use_container_width = True)
+            st.caption(f"shape matrix dimensions: {df.shape[0]} rows by {df.shape[1]} columns")
+            st.markdown("---")
+            st.markdown("Matplotlib renders") 
+            chart_type=st.selectbox(
+                "What plot visualization?",
+                [
+                    "line/scatter plot", 
+                    "Pie chart generator",
+                    "double bar graph comparison",
+                    "histogram"
+                 ]
+
+            )   
+            all_columns=list(df.columns)
+            fig,ax=plt.subplots()
+            if chart_type =="line/scatter plot":
+                col_x=st.selectbox("Whats the x axis", all_columns, index=0)
+                col_y=st.selectbox("whats the y axis", all_columns, index=min(1,len(all_columns)-1))
+                markercolor = st.selectbox("What color marker", ["green", "red", "blue"])
+                markershape = st.selectbox("what shape", ["o (circle)", "h (hexagon)", "- (line)", "p (pentagon)", "s (square)"])
+                marker=markercolor[0]+markershape[0]
+                
+                ax.plot(df[col_x], df[col_y], marker)
+                ax.set_xlabel(col_x)
+                ax.set_ylabel(col_y)
+                st.pyplot(fig)
+                
+            elif chart_type=="Pie chart generator":
+                label_col = st.selectbox("Select Categorical Labels Column (e.g., hobby/ingredient):", all_columns)
+                value_col = st.selectbox("Select Quantitative Value Counts Column:", all_columns)
+                
+                ax.pie(df[value_col], labels=df[label_col], autopct='%1.2f%%', shadow=True)
+                st.pyplot(fig)
+            elif chart_type=="double bar graph comparison":
+                x_axis_col = st.selectbox("Select Independent Variable Label Column (e.g., years):", all_columns)
+                series_1 = st.selectbox("Select Performance Group 1 Metric (e.g., Phelps):", all_columns)
+                series_2 = st.selectbox("Select Performance Group 2 Metric (e.g., Spitz):", all_columns)
+                
+                ax.bar(df[x_axis_col], df[series_1], alpha=0.5, label=series_1, color='blue')
+                ax.bar(df[x_axis_col], df[series_2], alpha=0.5, label=series_2, color='green')
+                ax.set_xlabel(x_axis_col)
+                ax.legend()
+                st.pyplot(fig)
+            
+            elif chart_type== "histogram":
+                data_col = st.selectbox("Select Distribution Numeric Column (e.g., movieratings):", all_columns)
+                bin_count = st.slider("Select Quantity Partition Bins", 3, 20, 6)
+                
+                ax.hist(df[data_col], bins=bin_count, rwidth=0.8, color='purple', alpha=0.7)
+                ax.set_ylabel("Frequency Counts")
+                ax.set_xlabel(data_col)
+                st.pyplot(fig)
+            else:
+                st.info("Put in csv or or an xy coordinate text file")
