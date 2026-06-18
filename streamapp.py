@@ -110,12 +110,14 @@ if mode == "Image Filters":
         
         
         
-        
 #==============================================Mode 2 - video =====================================
 
 elif mode == "Live Filters":
     st.subheader("Live video effects! yayyayayay")
     
+    # We import this inside the mode so it doesn't slow down your other tabs!
+    from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
+
     live_filter = st.selectbox(
         "Select Active Pipeline:",
         [
@@ -128,79 +130,58 @@ elif mode == "Live Filters":
     )
     
     speed = st.sidebar.slider("Line Speed", 1, 12, 4) if live_filter == "Line filter" else 0
-    run_cam = st.checkbox("< -- click here to give me FULL control over your camera (dont worry it only enables the program to see your camera lol its not dangerous i think)")
-    
-    col_left, col_right = st.columns(2)
-    
-    with col_left:
-        st.markdown("###Original Live Feed")
-        LIVE_CONTAINER = st.image([])
-        
-    with col_right:
-        st.markdown(f"###Applied Effect: {live_filter}")
-        EFFECT_CONTAINER = st.image([])
-    
-    if run_cam:
-        camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-        liney = 0
-        canvas = None
-        live_thresh = 80
-        if live_filter == "Threshold Matrix":
-            live_thresh = st.slider("Live Binary Threshold Limit Picker", 0, 255, 80)
-        while run_cam:
-            ret, frame = camera.read()
-            if not ret:
-                st.error("Error: Camera stream stopped working")
-                break
-            
-            raw_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            LIVE_CONTAINER.image(raw_rgb)
+    live_thresh = st.slider("Live Binary Threshold Limit Picker", 0, 255, 80) if live_filter == "Threshold Matrix" else 80
+
+    # This custom engine processes the streaming browser frames on the fly
+    class VideoProcessor(VideoTransformerBase):
+        def __init__(self):
+            self.liney = 0
+            self.canvas = None
+
+        def transform(self, frame):
+            # Convert the incoming browser WebRTC frame into a standard numpy matrix array
+            img = frame.to_ndarray(format="bgr24")
             
             if live_filter == "regular video":
-                EFFECT_CONTAINER.image(raw_rgb)
+                out_frame = img
                 
             elif live_filter == "Threshold Matrix":
-                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                col_left, col_right = st.columns(2)
-    
+                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 _, blackf = cv2.threshold(gray, live_thresh, 255, cv2.THRESH_BINARY_INV)
                 gray_3ch = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
                 bin_3ch = cv2.cvtColor(blackf, cv2.COLOR_GRAY2BGR)
-                matrix_strip = np.hstack((gray_3ch, bin_3ch))
-                
-                EFFECT_CONTAINER.image(cv2.cvtColor(matrix_strip, cv2.COLOR_BGR2RGB))
+                out_frame = np.hstack((gray_3ch, bin_3ch))
                 
             elif live_filter == "Slicing":
-                roi = frame[0:480, 0:320]
-                EFFECT_CONTAINER.image(cv2.cvtColor(roi, cv2.COLOR_BGR2RGB))
+                # Keep matching your original frame dimension cutouts
+                out_frame = img[0:480, 0:320]
                 
             elif live_filter == "make half red":
-                overwritten = frame.copy()
-                overwritten[0:480, 0:320] = (0, 0, 255)
-                EFFECT_CONTAINER.image(cv2.cvtColor(overwritten, cv2.COLOR_BGR2RGB))
+                out_frame = img.copy()
+                out_frame[0:480, 0:320] = (0, 0, 255)
                 
             elif live_filter == "Line filter":
-                if canvas is None or canvas.shape != frame.shape:
-                    canvas = frame.copy()
+                if self.canvas is None or self.canvas.shape != img.shape:
+                    self.canvas = img.copy()
                     
-                canvas[liney:liney+speed, :] = frame[liney:liney+speed, :]
-                display_frame = frame.copy()
-                if liney > 0:
-                    display_frame[0:liney, :] = canvas[0:liney, :]
+                self.canvas[self.liney:self.liney+speed, :] = img[self.liney:self.liney+speed, :]
+                out_frame = img.copy()
+                if self.liney > 0:
+                    out_frame[0:self.liney, :] = self.canvas[0:self.liney, :]
                     
-                cv2.line(display_frame, (0, liney), (frame.shape[1], liney), (255, 50, 50), 2)
+                cv2.line(out_frame, (0, self.liney), (img.shape[1], self.liney), (255, 50, 50), 2)
                 
-                liney += speed
-                if liney >= frame.shape[0]:
-                    liney = 0
-                    canvas = frame.copy()
-                    
-                EFFECT_CONTAINER.image(cv2.cvtColor(display_frame, cv2.COLOR_BGR2RGB))
-                
-        camera.release()
-    else:
-        st.warning("Camera hardware module doesnt exist, plug it back in now. or your computers bugged")
-        
+                self.liney += speed
+                if self.liney >= img.shape[0]:
+                    self.liney = 0
+                    self.canvas = img.copy()
+            
+            # WebRTC requires returning the frame converted back to RGB color formatting
+            return cv2.cvtColor(out_frame, cv2.COLOR_BGR2RGB)
+
+    # Launch the live video streamer component directly on the interface canvas page
+    webrtc_streamer(key="opencv-filter-streamer", video_transformer_factory=VideoProcessor)
+ 
         
 #==============================================Mode 3 - Data Analytics Sandbox =====================================
 elif mode=="Data Visualization":
