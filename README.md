@@ -67,14 +67,38 @@ yeah i know its not good motivation but thats the truth so...
 
 ---
 ## How it works
+Enter the page on https://opencvskills-wcxmh7pkwunnqc2rrdjumx.streamlit.app/   
+Navigate to your chosen filter using the colapsable sidebar.    
+
+
+**For image filters:**
+upload an image (png, jpg, jpeg)    
+Wat a few seconds    
+Use the dropdown on the right to change it to whatever filter you want!  
+
+**for Data Visualization**
+navigate to data visualization using the sidebar  
+Upload a CSV or TXT file with at least two columns. Use xy.txt(located in data visualization folder in this repo) if you don't have one  
+chose your types of plot visualization and assign columns to values. Play around with it!
+
+
+**For Live filters**
+Navigate to live filters.   
+After deciding what filter to use based off the dropdown menu, reload the page(to avoid any bugs)  
+Click on the filter again,  
+Press START!  
+
+hint: you can modify some effects using the sliders at the top of the page under the dropdown OR on the sidebar (if they are there.) The video also records and plays back audio, so turning off your volume can give a better experience!
+
+
 
 ## Bugs
 Yeah it looks like there are bugs with this app...  
 For the section: live filters, there are two big issues. 
-# Blue - (They call me the opening credits of iron man 3 the way I'm blue). The video processor got all messed up because it's now on the web and it's making everything blue for some reason. It looks like the red and blue are swapping around lol
-# May not work? - I tested this on my brothers' laptop as well. For him, the image filters and data visualization worked fine, but only the line filter and black and white one seemed to work for live filters. 
+**Blue**- (They call me the opening credits of iron man 3 the way I'm blue). The video processor got all messed up because it's now on the web and it's making everything blue for some reason. It looks like the red and blue are swapping around lol
+***have to reload** - I tested this on my brothers' laptop as well. For him, the image filters and data visualization worked fine, but only the line filter and black and white one seemed to work for live filters. 
 
-# ## I found a fix! refresh the page, pick the filter, then start the camera! or else it doesnt work!## 
+# ** I found a fix! refresh the page, pick the filter, then start the camera! or else it doesnt work!**
 
 
 ---
