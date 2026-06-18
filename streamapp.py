@@ -136,6 +136,7 @@ elif mode == "Live Filters":
         def __init__(self):
             self.liney = 0
             self.canvas = None
+            #hiosjaifj
 
         def recv(self, frame):
             img = frame.to_ndarray(format="bgr24")
