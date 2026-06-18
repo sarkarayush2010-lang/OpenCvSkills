@@ -115,8 +115,8 @@ if mode == "Image Filters":
 elif mode == "Live Filters":
     st.subheader("Live video effects! yayyayayay")
     
-    # We import this inside the mode so it doesn't slow down your other tabs!
-    from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
+    # FIX: Using the updated WebRTC naming conventions
+    from streamlit_webrtc import webrtc_streamer, VideoProcessorBase
 
     live_filter = st.selectbox(
         "Select Active Pipeline:",
@@ -132,14 +132,12 @@ elif mode == "Live Filters":
     speed = st.sidebar.slider("Line Speed", 1, 12, 4) if live_filter == "Line filter" else 0
     live_thresh = st.slider("Live Binary Threshold Limit Picker", 0, 255, 80) if live_filter == "Threshold Matrix" else 80
 
-    # This custom engine processes the streaming browser frames on the fly
-    class VideoProcessor(VideoTransformerBase):
+    class VideoProcessor(VideoProcessorBase):
         def __init__(self):
             self.liney = 0
             self.canvas = None
 
-        def transform(self, frame):
-            # Convert the incoming browser WebRTC frame into a standard numpy matrix array
+        def recv(self, frame):
             img = frame.to_ndarray(format="bgr24")
             
             if live_filter == "regular video":
@@ -153,7 +151,6 @@ elif mode == "Live Filters":
                 out_frame = np.hstack((gray_3ch, bin_3ch))
                 
             elif live_filter == "Slicing":
-                # Keep matching your original frame dimension cutouts
                 out_frame = img[0:480, 0:320]
                 
             elif live_filter == "make half red":
@@ -176,12 +173,10 @@ elif mode == "Live Filters":
                     self.liney = 0
                     self.canvas = img.copy()
             
-            # WebRTC requires returning the frame converted back to RGB color formatting
-            return cv2.cvtColor(out_frame, cv2.COLOR_BGR2RGB)
+            import av
+            return av.VideoFrame.from_ndarray(out_frame, format="rgb24")
 
-    # Launch the live video streamer component directly on the interface canvas page
-    webrtc_streamer(key="opencv-filter-streamer", video_transformer_factory=VideoProcessor)
- 
+    webrtc_streamer(key="opencv-filter-streamer", video_processor_factory=VideoProcessor)
         
 #==============================================Mode 3 - Data Analytics Sandbox =====================================
 elif mode=="Data Visualization":
