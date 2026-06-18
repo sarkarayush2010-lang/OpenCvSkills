@@ -16,10 +16,10 @@ This project was created for Hack Club's Horizons Event!
 ---
 
 ## Features
-* **Image Filters:** I made presets for popular games! Every preset can be adjusted later on with the custom sliders. The D&D one might be wrong but i dont play it sorry
-* **Live Filters:** Adjust amount of dice and amount of sides to play any game you want
-* **Data Visualization:** Using Pandas and Matplotlib, you can import a csv or txt file and graph values in multiple different styles!
-* **Streamlit** intuitive with sidebar navigation!
+* **Image Filters:** makw your image greyscale, black and white, invert it, erode, dialate, and so much more! has to be jpeg, jpg, or png
+* **Live Filters:** Play with video filters, that cut the screen, act like the trending line filter, make you black and white, and more!
+* **Data Visualization:** Using Pandas and Matplotlib, you can import a csv or txt file and graph values in multiple different styles! Graph, make Pie charts and more!
+* **Streamlit** intuitive with sidebar navigation! 
 
 
 ---
@@ -28,14 +28,16 @@ Main Desktop layout
 ![Screenshot1](image.png)
 Line filter
 
+<img width="2559" height="1315" alt="image" src="https://github.com/user-attachments/assets/55283b45-8086-4996-b53a-e5bbcc5924c0" />
 
-Presets  
+Grayscale Image  
+
+<img width="2095" height="1233" alt="image" src="https://github.com/user-attachments/assets/411f388c-6a92-451a-88ce-0d57891f6d27" />
+<img width="1144" height="870" alt="image" src="https://github.com/user-attachments/assets/2d2d4490-e949-4fec-bc61-f76604965422" />
+
+Graphing  
 
 
-Example  
-
-
-Mobile Layout
 
 
 ---
