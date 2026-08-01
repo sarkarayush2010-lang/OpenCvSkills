@@ -93,23 +93,35 @@ Press START!
 
 hint: you can modify some effects using the sliders at the top of the page under the dropdown OR on the sidebar (if they are there.) The video also records and plays back audio, so turning off your volume can give a better experience!
 
+**For Hand Tracking**
+Nothing to do :) just turn it on and wave your hand around it just looks cool lol
 
+**for finger painter**
+Similar to hand tracking, but use your fingers to control it. Pinch and move up and down to increase size, point to draw, and do a peace symbol or a v with your index and middle finger to clear
+
+**graphing calculator**
+Just follow instructions on screen
 
 ## Bugs
-Yeah it looks like there are bugs with this app...  
-For the section: live filters, there are two big issues. 
-**Blue**- (They call me the opening credits of iron man 3 the way I'm blue). The video processor got all messed up because it's now on the web and it's making everything blue for some reason. It looks like the red and blue are swapping around lol
-***have to reload** - I tested this on my brothers' laptop as well. For him, the image filters and data visualization worked fine, but only the line filter and black and white one seemed to work for live filters. 
 
-# ** I found a fix! refresh the page, pick the filter, then start the camera! or else it doesnt work!**
+**Fixed  - video Filters bug** - Video formats arent blue anymore
+**Fixed - Video Filters bug** - Dont always have to reload after applying new filters!
 
+**New Bugs**
+* **Music Visualizer** some random glitch or something makes it only work with some files. I tested with songs from currents by tame impala and for some reason Nangs, Cause im a man, The moment, diciples, and Past life didnt work but the rest did. i kinda dont have any other mp3 files on my pc but ill get some soon enough
+* **Finger painting** When you switch to finger painting, reload the tab pls
+* **Image recognition** doesnt work with streamlit. if you want to test that out just download the code and run "pip install tensorflow" and then run "streamlit run streamapp.py"
 
 ---
 ## AI use and Other Resource things
 
-
 AI use
-Apart from google search AI summaries(if that even counts lol) for mainly syntaxes, I didn't use any generative AI to write my code. 
-I did have to troubleshoot *deploying* the app with gemini, but i dont think that counts either.  
-A lot of the resources I used came from numpy and opencv documentation from a coding class that I do called Youngwonks, although I completely structered everything myself!
-Also used random reddit and geeks for geeks and stack overflow threads.
+Apart from google search AI summaries(if that even counts lol) for mainly syntaxes, I didn't use any generative AI to write my code.   
+I did have to troubleshoot *deploying* the app with gemini, but i dont think that counts either.    
+A lot of the resources I used came from numpy and opencv documentation from a coding class that I do called Youngwonks, although I completely structered everything myself!  
+Also used random reddit and geeks for geeks and stack overflow threads.  
+
+I did have to debug a bit for the music visualizer with Gemini.  
+
+
+I think the rule is 30% AI or less and i definitely pass that lol maybe 5% is AI written 
